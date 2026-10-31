@@ -2,7 +2,7 @@
 
 Bezpečný webový trenažér proti telefonním a online podvodům, v češtině.
 
-**Vyzkoušet:** https://silverhardliner.github.io/zaveste-nanecisto/
+**Vyzkoušet:** https://silverhardliner.github.io/zaveste-nanecisto/ · **Video (70 s):** https://silverhardliner.github.io/zaveste-nanecisto/demo.mp4
 
 Vyberete si situaci (falešné „bezpečnostní oddělení banky“, „mami, mám nové číslo“, falešná platba při prodeji na bazaru) a v chatu volíte z připravených odpovědí. Podvodník přitlačuje stejnými triky jako ve skutečnosti. Na konci uvidíte rozbor každého svého rozhodnutí, použité manipulační taktiky a co dělat ve skutečnosti.
 

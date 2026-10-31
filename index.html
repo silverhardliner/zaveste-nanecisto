@@ -401,7 +401,7 @@ function finish(n){
   $('#debrief').innerHTML = `
     <div class="debrief">
       <div class="outcome ${n.end}"><h3>${n.end==='win'?'✋ ':'⚠️ '}${esc(n.title)}</h3><p>${esc(n.text)}</p></div>
-      <p>Vaše rozhodnutí: <strong>${safe}</strong> bezpečných, <strong>${risky}</strong> rizikových z ${path.length}.</p>
+      <p>Bezpečná rozhodnutí: <strong>${safe}</strong> · riziková: <strong>${risky}</strong> · celkem: <strong>${path.length}</strong></p>
       <h4>Rozbor vašich odpovědí</h4>
       <ol class="path">${path.map(c=>`<li class="${c.kind}"><div class="q"><span class="tag">${tagName[c.kind]}</span>${esc(c.t)}</div><div class="why">${esc(c.why)}</div></li>`).join('')}</ol>
       <h4>Jaké triky podvodník použil</h4>
