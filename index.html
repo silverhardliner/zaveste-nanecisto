@@ -57,7 +57,10 @@ h2{font-size:1.3rem;margin:32px 0 12px}
 .avatar{width:44px;height:44px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:1.4rem;flex:none}
 .chathead .nm{font-weight:700}
 .chathead .sb{font-size:.85rem;color:var(--muted)}
-.back{margin-left:auto;font:inherit;font-size:.85rem;background:none;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer}
+.hang{margin-left:auto;font:inherit;font-size:.85rem;font-weight:700;background:var(--risky);color:#fff;border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
+.hang:disabled{opacity:.4;cursor:default}
+.limits{margin-top:16px;font-size:.9rem;color:var(--muted);border:1px dashed var(--line);border-radius:10px;padding:10px 14px}
+.back{font:inherit;font-size:.85rem;background:none;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer}
 .chat{background:var(--surface-2);border:1px solid var(--line);border-top:0;border-radius:0 0 14px 14px;padding:16px;min-height:260px;display:flex;flex-direction:column;gap:10px}
 .setup{font-size:.9rem;color:var(--muted);text-align:center;font-style:italic;padding:0 8px}
 .msg{max-width:85%;padding:10px 14px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -146,6 +149,7 @@ footer{color:var(--muted);font-size:.85rem;padding:32px 0 40px}
       <div class="chathead">
         <div class="avatar" id="pAvatar"></div>
         <div><div class="nm" id="pName"></div><div class="sb" id="pSub"></div></div>
+        <button type="button" class="hang" id="hangBtn">📵 Zavěsit</button>
         <button type="button" class="back" id="backBtn">← Zpět</button>
       </div>
       <div class="chat" id="chat"></div>
@@ -331,7 +335,7 @@ const $ = s => document.querySelector(s);
 const store = {get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const results = {};
-let cur = null, path = [], timers = [];
+let cur = null, path = [], timers = [], over = false;
 
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function rich(s){return esc(s).replace(/\[\[(.+?)\]\]/g,'<span class="fake" title="Smyšlený odkaz, nikam nevede">$1</span>')}
@@ -351,7 +355,8 @@ function add(html, cls){const d=document.createElement('div'); d.className=cls; 
 
 function start(id){
   clearTimers();
-  cur = SCEN.find(s=>s.id===id); path=[];
+  cur = SCEN.find(s=>s.id===id); path=[]; over=false; $('#hangBtn').disabled=false;
+  $('#hangBtn').textContent = cur.channel==='Telefonát' ? '📵 Zavěsit' : '✋ Ukončit konverzaci';
   $('#home').style.display='none'; $('#play').style.display='block';
   $('#pAvatar').textContent=cur.icon; $('#pName').textContent=cur.name; $('#pSub').textContent=cur.sub;
   $('#chat').innerHTML=''; $('#debrief').innerHTML='';
@@ -385,6 +390,7 @@ function show(nodeId){
 }
 
 function finish(n){
+  over=true; $('#hangBtn').disabled=true;
   add(esc(n.sys),'sys');
   results[cur.id]=n.end;
   const safe = path.filter(c=>c.kind==='safe').length, risky = path.filter(c=>c.kind==='risky').length;
@@ -401,6 +407,7 @@ function finish(n){
       <h4>Co dělat ve skutečnosti</h4>
       <ul class="advice">${cur.advice.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
       <div class="remember">${esc(cur.remember)}</div>
+      <div class="limits"><strong>Co trenažér neumí:</strong> skutečný podvodník může přijít s úplně jiným příběhem a trenažér neposoudí, jestli je konkrétní hovor nebo zpráva podvod. Skóre ukazuje jen to, jak jste si vedli v tomto cvičení. Nenahrazuje banku ani policii.</div>
       <div class="btns">
         <button type="button" class="btn" id="againBtn">Zkusit znovu jinak</button>
         <button type="button" class="btn primary" id="nextBtn">Další situace: ${esc(nextS.title)}</button>
@@ -415,6 +422,15 @@ function finish(n){
 
 function goHome(){ clearTimers(); $('#play').style.display='none'; $('#home').style.display='block'; renderCards(); window.scrollTo({top:0}); }
 $('#backBtn').addEventListener('click', goHome);
+$('#hangBtn').addEventListener('click', () => {
+  if(!cur || over) return;
+  clearTimers();
+  document.querySelectorAll('#chat .choices, #chat .typing').forEach(e=>e.remove());
+  const t = cur.channel==='Telefonát' ? 'Zavěsil(a) jsem.' : 'Ukončil(a) jsem konverzaci.';
+  add(esc(t),'msg me');
+  path.push({t, kind:'safe', why:'Ukončit hovor nebo konverzaci můžete kdykoli. Je to nejlepší první krok, pak si věc ověřte sami jinou cestou.'});
+  finish(cur.nodes.win);
+});
 
 // font size + theme
 function setBig(on){ document.documentElement.classList.toggle('big', on); $('#bigBtn').setAttribute('aria-pressed', String(on)); store.set('zn-big', on?'1':'0'); }
