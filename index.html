@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zavěste nanečisto</title>
+<meta name="description" content="Bezpečný trenažér proti telefonním a online podvodům. Vyzkoušejte si, jak podvodníci tlačí, a naučte se je včas zastavit.">
+<meta property="og:title" content="Zavěste nanečisto">
+<meta property="og:description" content="Bezpečný trenažér proti telefonním a online podvodům. Smyšlené scénáře, žádná data, rozbor taktik.">
+<style>
+:root{
+  --bg:#f6f4ef; --surface:#ffffff; --surface-2:#efece5; --text:#1d1b18; --muted:#5d5850;
+  --line:#dcd7cc; --accent:#b4321f; --accent-ink:#ffffff; --them:#ffffff; --me:#1f4e79; --me-ink:#ffffff;
+  --safe:#1e7a45; --safe-bg:#e3f3e8; --risky:#b4321f; --risky-bg:#fbe7e3; --ok:#8a6a12; --ok-bg:#f8f0d6;
+  --warn-bg:#fff4d6; --warn-line:#e5c86b; --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161513; --surface:#211f1c; --surface-2:#2a2824; --text:#efebe3; --muted:#aaa397;
+    --line:#3a3731; --accent:#e0644f; --accent-ink:#1a0d0a; --them:#2a2824; --me:#3b6e9c; --me-ink:#ffffff;
+    --safe:#5fcf8c; --safe-bg:#183324; --risky:#f08473; --risky-bg:#3a1d18; --ok:#e2c36a; --ok-bg:#352d14;
+    --warn-bg:#2f2a17; --warn-line:#6e5d25; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161513; --surface:#211f1c; --surface-2:#2a2824; --text:#efebe3; --muted:#aaa397;
+  --line:#3a3731; --accent:#e0644f; --accent-ink:#1a0d0a; --them:#2a2824; --me:#3b6e9c; --me-ink:#ffffff;
+  --safe:#5fcf8c; --safe-bg:#183324; --risky:#f08473; --risky-bg:#3a1d18; --ok:#e2c36a; --ok-bg:#352d14;
+  --warn-bg:#2f2a17; --warn-line:#6e5d25; --shadow:none;
+}
+*{box-sizing:border-box}
+html{font-size:18px}
+html.big{font-size:22px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.5}
+a{color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+header.top{padding:28px 0 8px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand h1{margin:0;font-size:2rem;letter-spacing:-.02em;line-height:1.1}
+.brand h1 span{color:var(--accent)}
+.tools{display:flex;gap:8px}
+.tools button{font:inherit;font-size:.85rem;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.lead{font-size:1.1rem;color:var(--muted);margin:12px 0 0;max-width:40em}
+.notice{margin:20px 0;background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:12px;padding:12px 16px;font-size:.95rem}
+h2{font-size:1.3rem;margin:32px 0 12px}
+.cards{display:grid;gap:12px}
+.card{display:block;width:100%;text-align:left;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer;box-shadow:var(--shadow)}
+.card:hover,.card:focus-visible{border-color:var(--accent);outline:none}
+.card .ch{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700}
+.card .tt{font-size:1.15rem;font-weight:700;margin:2px 0 4px}
+.card .ds{color:var(--muted);font-size:.95rem}
+.card .done{float:right;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:999px}
+.done.win{background:var(--safe-bg);color:var(--safe)} .done.lose{background:var(--risky-bg);color:var(--risky)}
+/* chat */
+#play{display:none}
+.chathead{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px 14px 0 0;padding:12px 16px}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:1.4rem;flex:none}
+.chathead .nm{font-weight:700}
+.chathead .sb{font-size:.85rem;color:var(--muted)}
+.back{margin-left:auto;font:inherit;font-size:.85rem;background:none;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chat{background:var(--surface-2);border:1px solid var(--line);border-top:0;border-radius:0 0 14px 14px;padding:16px;min-height:260px;display:flex;flex-direction:column;gap:10px}
+.setup{font-size:.9rem;color:var(--muted);text-align:center;font-style:italic;padding:0 8px}
+.msg{max-width:85%;padding:10px 14px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.them{background:var(--them);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.me{background:var(--me);color:var(--me-ink);align-self:flex-end;border-bottom-right-radius:4px}
+.msg .fake{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85em;color:var(--risky);text-decoration:underline dotted}
+.sys{align-self:center;font-size:.85rem;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+.typing{align-self:flex-start;color:var(--muted);font-size:.85rem;font-style:italic}
+.choices{display:grid;gap:8px;margin-top:6px}
+.choices .lbl{font-size:.85rem;color:var(--muted)}
+.choice{font:inherit;text-align:left;background:var(--surface);color:var(--text);border:2px solid var(--line);border-radius:12px;padding:10px 14px;cursor:pointer}
+.choice:hover,.choice:focus-visible{border-color:var(--me);outline:none}
+/* debrief */
+.debrief{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+.outcome{border-radius:10px;padding:12px 16px;margin-bottom:12px}
+.outcome.win{background:var(--safe-bg);color:var(--safe)}
+.outcome.lose{background:var(--risky-bg);color:var(--risky)}
+.outcome h3{margin:0 0 4px;font-size:1.25rem}
+.outcome p{margin:0;color:var(--text)}
+.debrief h4{margin:18px 0 8px;font-size:1.05rem}
+.path{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.path li{border-left:4px solid var(--line);padding:6px 12px;background:var(--surface-2);border-radius:0 8px 8px 0}
+.path li.safe{border-color:var(--safe)} .path li.risky{border-color:var(--risky)} .path li.ok{border-color:var(--ok)}
+.path .q{font-weight:600}
+.path .tag{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-right:6px}
+.path li.safe .tag{color:var(--safe)} .path li.risky .tag{color:var(--risky)} .path li.ok .tag{color:var(--ok)}
+.path .why{font-size:.92rem;color:var(--muted)}
+.tactics{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.tactics li{background:var(--surface-2);border-radius:8px;padding:8px 12px}
+.tactics b{display:block}
+.advice{margin:0;padding-left:1.2em}
+.advice li{margin:4px 0}
+.remember{margin-top:16px;font-size:1.15rem;font-weight:700;border-left:4px solid var(--accent);padding:6px 12px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.btn{font:inherit;border-radius:999px;padding:10px 18px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--text)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:12px}
+.panel ul{margin:0;padding-left:1.2em}
+.panel li{margin:6px 0}
+.help{border-color:var(--risky)}
+footer{color:var(--muted);font-size:.85rem;padding:32px 0 40px}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Zavěste <span>nanečisto</span></h1>
+      <div class="tools">
+        <button type="button" id="bigBtn" aria-pressed="false">A+ Větší písmo</button>
+        <button type="button" id="themeBtn">◐ Režim</button>
+      </div>
+    </div>
+    <p class="lead">Podvodníci dnes volají jako banka, píšou jako vaše dítě a s pomocí AI umějí napodobit i hlas. Tady si v klidu a bez rizika vyzkoušíte, jak takový nátlak vypadá, a naučíte se ho včas zastavit.</p>
+  </header>
+
+  <main>
+    <section id="home">
+      <div class="notice"><strong>Je to jen cvičení.</strong> Všechny hovory a zprávy jsou smyšlené. Vybíráte z připravených odpovědí, nic nepíšete a stránka nikam nic neposílá ani neukládá.</div>
+      <h2>Vyberte si situaci</h2>
+      <div class="cards" id="cards"></div>
+
+      <h2>Co když už se to stalo?</h2>
+      <div class="panel help">
+        <ul>
+          <li><strong>Ihned volejte svou banku</strong> na číslo z platební karty nebo z oficiální aplikace a nechte zablokovat kartu či účet. Čas rozhoduje.</li>
+          <li><strong>Pokud jste někomu dali vzdálený přístup</strong> (nainstalovali jste aplikaci na jeho žádost), odpojte zařízení od internetu a řekněte to bance.</li>
+          <li><strong>Oznamte to Policii ČR na lince 158.</strong> Za podvod se nemusíte stydět, oběťmi bývají i velmi opatrní lidé.</li>
+        </ul>
+      </div>
+
+      <h2>Jak trenažér vznikl a co neumí</h2>
+      <div class="panel">
+        <ul>
+          <li><strong>Scénáře jsou smyšlené</strong>, ale stojí na typech podvodů, před kterými veřejně varují banky a policie. Neobsahují skutečné firmy, jména ani funkční odkazy.</li>
+          <li><strong>AI pomohla scénáře navrhnout a napsat</strong> z pohledu podvodníka i oběti. Samotný trenažér ale běží bez AI: každá odpověď je předem napsaná, takže si nic nevymýšlí a nepotřebuje od vás žádná data.</li>
+          <li><strong>Nic se nesbírá.</strong> Žádné účty, cookies ani analytika. Vše běží jen ve vašem prohlížeči. Uloží se pouze, jestli máte zapnuté větší písmo.</li>
+          <li><strong>Neumí poznat, zda konkrétní hovor nebo zpráva je podvod.</strong> Skuteční podvodníci své věty neustále mění. Učte se principy, ne přesné formulace.</li>
+          <li><strong>Nenahrazuje banku ani policii.</strong> Při jakékoli pochybnosti zavěste a ověřte si věc sami, jinou cestou.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="play" aria-live="polite">
+      <div class="chathead">
+        <div class="avatar" id="pAvatar"></div>
+        <div><div class="nm" id="pName"></div><div class="sb" id="pSub"></div></div>
+        <button type="button" class="back" id="backBtn">← Zpět</button>
+      </div>
+      <div class="chat" id="chat"></div>
+      <div id="debrief"></div>
+    </section>
+  </main>
+
+  <footer>
+    Zavěste nanečisto · prototyp pro AI výzvu pro Česko 2026 · zdrojový kód je veřejný na <a href="https://github.com/silverhardliner/zaveste-nanecisto">GitHubu</a>.<br>
+    Vzdělávací cvičení, nejde o právní ani finanční poradenství.
+  </footer>
+</div>
+
+<script>
+const SCEN = [
+{
+  id:'banka', icon:'📞', channel:'Telefonát', title:'Volá „bezpečnostní oddělení“ vaší banky',
+  teaser:'Neznámý muž hlásí podezřelou platbu z vašeho účtu a spěchá.',
+  name:'Banka – bezpečnostní oddělení', sub:'Příchozí hovor · +420 800 ••• •••',
+  setup:'Je úterý odpoledne. Zvoní vám telefon a na displeji je číslo, které vypadá jako linka vaší banky.',
+  start:'n1',
+  nodes:{
+    n1:{say:['Dobrý den, tady Petr Novák, bezpečnostní oddělení vaší banky. Zaznamenali jsme podezřelou platbu 48 900 Kč do zahraničí z vašeho účtu. Zadávali jste ji vy?'],
+      choices:[
+        {t:'Ne, to jsem nebyl/a! Co mám dělat?', next:'n2', kind:'ok', why:'Přirozená reakce. Podvodník teď ale využije váš strach a začne vás vést.'},
+        {t:'Jak vím, že jste opravdu z banky?', next:'n1b', kind:'ok', why:'Dobrá otázka. Odpověď volajícího ale nic nedokazuje, ověřit si to musíte sami.'},
+        {t:'Zavěsím a zavolám si do banky sám/sama na číslo z karty.', next:'win', kind:'safe', why:'Přesně tak. Vlastní hovor na ověřené číslo podvodníka okamžitě odstřihne.'}
+      ]},
+    n1b:{say:['Rozumím, opatrnost je správná. Vidíte přece, že volám z oficiální linky banky, číslo si můžete ověřit na našem webu. Ale musíme jednat hned, platba se právě zpracovává.'],
+      choices:[
+        {t:'Dobře, číslo sedí. Co mám dělat?', next:'n2', kind:'risky', why:'Číslo na displeji se dá podvrhnout (tzv. spoofing). Shoda s webem banky nic nedokazuje.'},
+        {t:'I tak zavěsím a zavolám bance sám/sama.', next:'win', kind:'safe', why:'Správně. Jen hovor, který vytočíte vy, vás spojí opravdu s bankou.'}
+      ]},
+    n2:{say:['Platbu se nám podařilo pozastavit, ale útočník má k vašemu účtu přístup. Abychom vaše peníze ochránili, převedeme je na bezpečný účet, který vám banka dočasně zřídila. Do skončení vyšetřování.'],
+      choices:[
+        {t:'Dobře, kolik mám převést a kam?', next:'n3', kind:'risky', why:'„Bezpečný účet“ neexistuje. Banka po vás nikdy nebude chtít převádět peníze jinam.'},
+        {t:'Musím se nejdřív poradit s rodinou.', next:'n2b', kind:'ok', why:'Dobrý instinkt. Všimněte si, jak na to podvodník zareaguje.'},
+        {t:'Banka po mně přece nemůže chtít převádět peníze. Zavěšuji.', next:'win', kind:'safe', why:'Přesně. Žádost o převod na „bezpečný účet“ je jistý znak podvodu.'}
+      ]},
+    n2b:{say:['Na to bohužel není čas, každá minuta je riziko. A prosím, nikomu o tom zatím neříkejte, ani na pobočce. Vyšetřujeme i vlastní zaměstnance, kteří mohou být zapletení.'],
+      choices:[
+        {t:'Dobře, nikomu nic neřeknu. Co dál?', next:'n3', kind:'risky', why:'Žádost o mlčení je varovný signál. Podvodník vás odřízne od lidí, kteří by vás varovali.'},
+        {t:'Tohle zní divně. Zavěšuji a volám bance.', next:'win', kind:'safe', why:'Správně. Opravdová banka vám nikdy nezakáže mluvit s rodinou nebo pobočkou.'}
+      ]},
+    n3:{say:['Výborně. Kvůli zabezpečení si ještě nainstalujte aplikaci pro vzdálenou podporu, pošlu vám odkaz SMS. Náš technik vám přes ni nastaví ochranu účtu. Pak mi nadiktujete kód, který se vám zobrazí.'],
+      choices:[
+        {t:'Instaluji. Kód je 4 8 1…', next:'lose', kind:'risky', why:'Vzdálený přístup dává podvodníkovi kontrolu nad vaším telefonem nebo počítačem, včetně bankovnictví.'},
+        {t:'Ne. Do telefonu nikomu přístup nedám. Zavěšuji.', next:'win', kind:'safe', why:'Správně, i když pozdě. Pokud jste už něco převedli, ihned volejte banku.'}
+      ]},
+    win:{end:'win', sys:'Hovor ukončen',
+      title:'Zavěsili jste. Podvod zastaven.',
+      text:'Tak se to dělá. Opravdová banka vám nevadí, když zavěsíte a zavoláte jí sami.'},
+    lose:{end:'lose', sys:'Podvodník právě ovládá vaše zařízení',
+      title:'Tady byste přišli o úspory.',
+      text:'Přes vzdálený přístup by podvodník viděl vaše bankovnictví a mohl schvalovat platby. Ve skutečnosti by už bylo potřeba okamžitě volat banku.'}
+  },
+  tactics:[
+    {n:'Autorita', d:'Vydává se za banku. Lidé autoritám věří a nechtějí „dělat potíže“.'},
+    {n:'Strach a spěch', d:'Podezřelá platba a „každá minuta je riziko“. Ve stresu se nepřemýšlí.'},
+    {n:'Podvržené číslo', d:'Na displeji může být jakékoli číslo, i to opravdové bankovní.'},
+    {n:'Izolace', d:'„Nikomu to neříkejte, ani na pobočce.“ Aby vás nikdo nevaroval.'},
+    {n:'Bezpečný účet', d:'Neexistuje. Je to účet podvodníka.'},
+    {n:'Vzdálený přístup', d:'Aplikace, přes kterou podvodník převezme kontrolu nad vaším zařízením.'}
+  ],
+  advice:[
+    'Zavěste. Bance zavolejte sami na číslo z platební karty nebo z oficiální aplikace.',
+    'Banka ani policie po vás nikdy nebude chtít převádět peníze na jiný účet, instalovat aplikace nebo diktovat kódy.',
+    'Pokud jste už něco převedli nebo nainstalovali, volejte ihned banku a Policii ČR (158).'
+  ],
+  remember:'Banka nikdy nechce, abyste peníze „stěhovali“.'
+},
+{
+  id:'rodina', icon:'💬', channel:'Zpráva', title:'„Ahoj mami, mám nové číslo“',
+  teaser:'Vaše „dítě“ píše z neznámého čísla a brzy potřebuje peníze.',
+  name:'+420 7•• ••• •••', sub:'Neznámé číslo · zpráva',
+  setup:'Večer vám přijde zpráva z čísla, které neznáte.',
+  start:'n1',
+  nodes:{
+    n1:{say:['Ahoj mami, rozbil se mi telefon 😩 tohle je moje nové číslo, to starý si smaž. Napiš mi, až budeš mít chvilku.'],
+      choices:[
+        {t:'Ahoj zlatíčko, co se stalo? Jsi v pořádku?', next:'n2', kind:'ok', why:'Přirozené. Zatím ale nemáte ověřeno, kdo vám doopravdy píše.'},
+        {t:'Zavolám ti na staré číslo, ať vím, že jsi to ty.', next:'n1b', kind:'safe', why:'Výborně. Ověření jinou cestou je nejlepší obrana.'},
+        {t:'Kdo jste? Moje děti mají svá čísla.', next:'win', kind:'safe', why:'Správně. Neznámé číslo, které se vydává za blízkého, je klasický začátek podvodu.'}
+      ]},
+    n1b:{say:['To nepůjde, ten starej je úplně mrtvej 😕 proto píšu z tohohle.'],
+      choices:[
+        {t:'Aha, tak jo. Co potřebuješ?', next:'n2', kind:'risky', why:'„Starý telefon nefunguje“ je výmluva, která vám má zabránit v ověření.'},
+        {t:'Tak mi zavolej z tohohle čísla, chci tě slyšet.', next:'n1c', kind:'safe', why:'Dobře. Ale pozor, dnes nestačí ani hlas.'}
+      ]},
+    n1c:{say:['Teď nemůžu volat, sedím na poradě 🙈','🎤 Hlasová zpráva (0:06): „Mami, to jsem já, prosím pomoz mi, pak ti všechno vysvětlím.“'],
+      choices:[
+        {t:'Je to jeho/její hlas. Dobře, co potřebuješ?', next:'n2', kind:'risky', why:'Hlas se dnes dá pomocí AI napodobit z pár vteřin nahrávky ze sociálních sítí. Hlas sám nic nedokazuje.'},
+        {t:'Napiš mi, jak se jmenoval náš první pes.', next:'n1d', kind:'safe', why:'Výborně. Otázka, na kterou zná odpověď jen váš blízký, nebo domluvené rodinné heslo.'}
+      ]},
+    n1d:{say:['Mami, teď fakt nemám čas na hádanky 😤 potřebuju rychle zaplatit fakturu, jinak bude penále.'],
+      choices:[
+        {t:'Promiň, máš pravdu. Co mám zaplatit?', next:'n2', kind:'risky', why:'Odpověď nepřišla. Podvodník vás tlačí, abyste od ověření ustoupili.'},
+        {t:'Bez odpovědi nic neposílám. Ozvu se ti přes tátu.', next:'win', kind:'safe', why:'Přesně tak. Skutečné dítě to pochopí, podvodník zmizí.'}
+      ]},
+    n2:{say:['Potřebuju zaplatit fakturu, dneska je splatnost a z novýho telefonu se mi ještě nejde přihlásit do bankovnictví. Můžeš to za mě poslat? 18 450 Kč, zítra ti to vrátím ❤️'],
+      choices:[
+        {t:'Jasně, pošli mi číslo účtu.', next:'lose', kind:'risky', why:'Nové číslo, spěch a žádost o peníze. To je typický vzorec tohoto podvodu.'},
+        {t:'Nejdřív to probereme s tátou, zavolám mu.', next:'n2b', kind:'safe', why:'Dobře. Zapojit dalšího člověka je silná ochrana.'},
+        {t:'Peníze přes zprávy neposílám. Vyřešíme to, až se uvidíme.', next:'win', kind:'safe', why:'Správně. Pevné pravidlo vás ochrání i ve stresu.'}
+      ]},
+    n2b:{say:['Ne, prosím, neříkej to tátovi, je mi to hrozně trapný 🙏 pošli to prosím rychle, jen tentokrát.'],
+      choices:[
+        {t:'Dobře, nikomu to neřeknu. Pošli číslo účtu.', next:'lose', kind:'risky', why:'Prosba o tajemství je varovný signál. Podvodník vás izoluje od lidí, kteří by ho odhalili.'},
+        {t:'Právě proto si to ověřím. Bez toho nic nepošlu.', next:'win', kind:'safe', why:'Přesně tak. Žádost o mlčení je důvod k větší opatrnosti, ne menší.'}
+      ]},
+    win:{end:'win', sys:'Konverzace ukončena',
+      title:'Neposlali jste nic. Podvod zastaven.',
+      text:'Když vám opravdu píše vaše dítě, ověření přes jiný kanál ho nezdrží. Podvodníkovi ale vezme vše.'},
+    lose:{end:'lose', sys:'Platba odeslána',
+      title:'Tady byste poslali 18 450 Kč podvodníkovi.',
+      text:'A nejspíš by brzy přišla další „faktura“. Peníze poslané převodem se zpravidla vracejí velmi těžko.'}
+  },
+  tactics:[
+    {n:'Nový kontakt', d:'„Rozbil se mi telefon“ vysvětluje neznámé číslo a zabraňuje ověření.'},
+    {n:'Emoce', d:'Oslovení „mami“, srdíčka a omluvy. Cílem je, abyste jednali srdcem, ne hlavou.'},
+    {n:'Spěch', d:'Splatnost dnes, penále, „jen tentokrát“.'},
+    {n:'Tajemství', d:'„Neříkej to tátovi.“ Druhý člověk by podvod nejspíš poznal.'},
+    {n:'Napodobený hlas', d:'Krátká hlasová zpráva může být vytvořená AI. Hlas ani fotka dnes nic nedokazují.'}
+  ],
+  advice:[
+    'Ověřte si osobu jinou cestou: zavolejte na staré číslo nebo přes dalšího člena rodiny.',
+    'Domluvte si v rodině tajné heslo pro krizové situace. Zabere to minutu a funguje i proti napodobenému hlasu.',
+    'Peníze na žádost ze zprávy neposílejte, dokud si s člověkem nepromluvíte přes kontakt, který znáte.'
+  ],
+  remember:'Nové číslo + žádost o peníze = nejdřív ověřit.'
+},
+{
+  id:'bazar', icon:'🚲', channel:'Inzerát', title:'Prodáváte kolo na bazaru',
+  teaser:'Kupující chce zaplatit předem „přes kurýra“ a posílá odkaz.',
+  name:'Kupující z inzerátu', sub:'Zpráva přes inzertní portál',
+  setup:'Na internetovém bazaru prodáváte dětské kolo za 2 500 Kč. Ozve se zájemce.',
+  start:'n1',
+  nodes:{
+    n1:{say:['Dobrý den, kolo ještě máte? Beru ho. Jsem mimo Prahu, tak ho pošleme kurýrem. Platbu i dopravu zaplatím předem přes službu Bezpečná platba.'],
+      choices:[
+        {t:'Dobrý den, ano. Jak to bude probíhat?', next:'n2', kind:'ok', why:'V pořádku. Teď pozor na to, co přijde.'},
+        {t:'Prodávám jen osobně, peníze při předání.', next:'n1b', kind:'safe', why:'Dobré pravidlo. Osobní předání je nejbezpečnější.'}
+      ]},
+    n1b:{say:['Bohužel nemám jak přijet. Kurýr je jistější pro oba, peníze vám přijdou hned 🙂'],
+      choices:[
+        {t:'Tak to se nedomluvíme, děkuji.', next:'win', kind:'safe', why:'Správně. Zájemce, který odmítá osobní předání a tlačí na „bezpečnou platbu“, je podezřelý.'},
+        {t:'Dobře, tak jak to funguje?', next:'n2', kind:'ok', why:'Ještě se nic nestalo, ale buďte ve střehu.'}
+      ]},
+    n2:{say:['Hotovo, zaplaceno 👍 Tady je odkaz, kde si peníze převezmete:\n[[bezpecne-prevzeti-platby.example/48213]]\nStačí vyplnit číslo karty, platnost a CVV, aby vám to připsali.'],
+      choices:[
+        {t:'Otevřu odkaz a vyplním údaje z karty.', next:'n3', kind:'risky', why:'K přijetí peněz nikdy nepotřebujete CVV ani platnost karty. Stránka je falešná.'},
+        {t:'K přijetí peněz přece nepotřebuji CVV. To je podvod.', next:'win', kind:'safe', why:'Přesně tak. Kdo vám platí, nepotřebuje vaše CVV.'},
+        {t:'Ověřím si to přímo na webu bazaru, ne přes váš odkaz.', next:'win', kind:'safe', why:'Správně. Odkazům od protistrany nevěřte, jděte na oficiální web sami.'}
+      ]},
+    n3:{say:['(Stránka) Pro připsání 2 500 Kč potvrďte prosím operaci ve své bankovní aplikaci.'],
+      choices:[
+        {t:'Potvrdím v aplikaci.', next:'lose', kind:'risky', why:'Ve skutečnosti jste schválili platbu ze svého účtu, ne příjem peněz.'},
+        {t:'Počkat, proč mám něco potvrzovat, když peníze dostávám?', next:'win', kind:'safe', why:'Správně, na poslední chvíli. Pokud jste už zadali údaje karty, zablokujte ji v aplikaci banky.'}
+      ]},
+    win:{end:'win', sys:'Konverzace ukončena',
+      title:'Nic jste nevyplnili ani nepotvrdili. Podvod zastaven.',
+      text:'Poctivý kupující vám buď zaplatí převodem na účet, nebo přijede osobně.'},
+    lose:{end:'lose', sys:'Platba schválena',
+      title:'Tady byste peníze neobdrželi, ale poslali.',
+      text:'S údaji z karty a potvrzením v aplikaci může podvodník z vaší karty zaplatit. Ihned kartu zablokujte a volejte banku.'}
+  },
+  tactics:[
+    {n:'Výmluva na dálku', d:'Kupující nemůže přijet, proto „kurýr“ a „bezpečná platba“.'},
+    {n:'Falešná služba', d:'Důvěryhodně znějící název, který s bazarem ani dopravcem nemá nic společného.'},
+    {n:'Podvodný odkaz', d:'Stránka vypadá jako platební brána, ale patří podvodníkovi.'},
+    {n:'Obrácená logika', d:'Máte peníze dostat, ale po vás chtějí údaje karty a potvrzení platby.'}
+  ],
+  advice:[
+    'Pro přijetí peněz stačí číslo účtu. Nikdy nezadávejte CVV ani platnost karty a nic nepotvrzujte v bankovní aplikaci.',
+    'Neklikejte na odkazy od kupujících. Služby bazaru nebo dopravce hledejte sami přímo na jejich oficiálním webu.',
+    'Pokud jste údaje zadali, okamžitě kartu zablokujte v aplikaci a volejte banku.'
+  ],
+  remember:'Kdo vám platí, nepotřebuje vaše CVV.'
+}
+];
+
+const $ = s => document.querySelector(s);
+const store = {get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const results = {};
+let cur = null, path = [], timers = [];
+
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function rich(s){return esc(s).replace(/\[\[(.+?)\]\]/g,'<span class="fake" title="Smyšlený odkaz, nikam nevede">$1</span>')}
+
+function renderCards(){
+  $('#cards').innerHTML = SCEN.map(s => {
+    const r = results[s.id];
+    const badge = r ? `<span class="done ${r}">${r==='win'?'Zvládnuto':'Zkuste znovu'}</span>` : '';
+    return `<button type="button" class="card" data-id="${s.id}">${badge}<div class="ch">${s.icon} ${s.channel}</div><div class="tt">${esc(s.title)}</div><div class="ds">${esc(s.teaser)}</div></button>`;
+  }).join('');
+  document.querySelectorAll('.card').forEach(b => b.addEventListener('click', () => start(b.dataset.id)));
+}
+
+function clearTimers(){timers.forEach(clearTimeout); timers=[];}
+function later(fn,ms){timers.push(setTimeout(fn, reduced?0:ms));}
+function add(html, cls){const d=document.createElement('div'); d.className=cls; d.innerHTML=html; $('#chat').appendChild(d); d.scrollIntoView({block:'nearest',behavior:reduced?'auto':'smooth'}); return d;}
+
+function start(id){
+  clearTimers();
+  cur = SCEN.find(s=>s.id===id); path=[];
+  $('#home').style.display='none'; $('#play').style.display='block';
+  $('#pAvatar').textContent=cur.icon; $('#pName').textContent=cur.name; $('#pSub').textContent=cur.sub;
+  $('#chat').innerHTML=''; $('#debrief').innerHTML='';
+  add(esc(cur.setup),'setup');
+  window.scrollTo({top:0});
+  show(cur.start);
+}
+
+function show(nodeId){
+  const n = cur.nodes[nodeId];
+  if(n.end){ finish(n); return; }
+  let t = 300;
+  n.say.forEach(line => {
+    const typing = {el:null};
+    later(()=>{ typing.el = add(cur.channel==='Telefonát'?'mluví…':'píše…','typing'); }, t);
+    t += Math.min(1600, 500 + line.length*8);
+    later(()=>{ typing.el && typing.el.remove(); add(rich(line),'msg them'); }, t);
+    t += 250;
+  });
+  later(()=>{
+    const box = document.createElement('div'); box.className='choices';
+    box.innerHTML = '<div class="lbl">Co odpovíte?</div>';
+    n.choices.forEach(c => {
+      const b=document.createElement('button'); b.type='button'; b.className='choice'; b.textContent=c.t;
+      b.addEventListener('click', () => { box.remove(); add(esc(c.t),'msg me'); path.push(c); later(()=>show(c.next), 350); });
+      box.appendChild(b);
+    });
+    $('#chat').appendChild(box);
+    box.scrollIntoView({block:'nearest',behavior:reduced?'auto':'smooth'});
+  }, t);
+}
+
+function finish(n){
+  add(esc(n.sys),'sys');
+  results[cur.id]=n.end;
+  const safe = path.filter(c=>c.kind==='safe').length, risky = path.filter(c=>c.kind==='risky').length;
+  const tagName = {safe:'Bezpečné', risky:'Rizikové', ok:'Pozor'};
+  const nextS = SCEN[(SCEN.indexOf(cur)+1)%SCEN.length];
+  $('#debrief').innerHTML = `
+    <div class="debrief">
+      <div class="outcome ${n.end}"><h3>${n.end==='win'?'✋ ':'⚠️ '}${esc(n.title)}</h3><p>${esc(n.text)}</p></div>
+      <p>Vaše rozhodnutí: <strong>${safe}</strong> bezpečných, <strong>${risky}</strong> rizikových z ${path.length}.</p>
+      <h4>Rozbor vašich odpovědí</h4>
+      <ol class="path">${path.map(c=>`<li class="${c.kind}"><div class="q"><span class="tag">${tagName[c.kind]}</span>${esc(c.t)}</div><div class="why">${esc(c.why)}</div></li>`).join('')}</ol>
+      <h4>Jaké triky podvodník použil</h4>
+      <ul class="tactics">${cur.tactics.map(x=>`<li><b>${esc(x.n)}</b>${esc(x.d)}</li>`).join('')}</ul>
+      <h4>Co dělat ve skutečnosti</h4>
+      <ul class="advice">${cur.advice.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
+      <div class="remember">${esc(cur.remember)}</div>
+      <div class="btns">
+        <button type="button" class="btn" id="againBtn">Zkusit znovu jinak</button>
+        <button type="button" class="btn primary" id="nextBtn">Další situace: ${esc(nextS.title)}</button>
+        <button type="button" class="btn" id="homeBtn">Všechny situace</button>
+      </div>
+    </div>`;
+  $('#againBtn').onclick = () => start(cur.id);
+  $('#nextBtn').onclick = () => start(nextS.id);
+  $('#homeBtn').onclick = goHome;
+  later(()=>$('#debrief').scrollIntoView({block:'start',behavior:reduced?'auto':'smooth'}), 200);
+}
+
+function goHome(){ clearTimers(); $('#play').style.display='none'; $('#home').style.display='block'; renderCards(); window.scrollTo({top:0}); }
+$('#backBtn').addEventListener('click', goHome);
+
+// font size + theme
+function setBig(on){ document.documentElement.classList.toggle('big', on); $('#bigBtn').setAttribute('aria-pressed', String(on)); store.set('zn-big', on?'1':'0'); }
+setBig(store.get('zn-big')==='1');
+$('#bigBtn').addEventListener('click', () => setBig(!document.documentElement.classList.contains('big')));
+$('#themeBtn').addEventListener('click', () => {
+  const r=document.documentElement, dark = r.dataset.theme ? r.dataset.theme==='dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  r.dataset.theme = dark ? 'light' : 'dark';
+});
+renderCards();
+</script>
+</body>
+</html>
