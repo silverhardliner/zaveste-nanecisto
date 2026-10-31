@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Zavěste nanečisto</title>
 <meta name="description" content="Bezpečný trenažér proti telefonním a online podvodům. Vyzkoušejte si, jak podvodníci tlačí, a naučte se je včas zastavit.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%93%B5%3C/text%3E%3C/svg%3E">
 <meta property="og:title" content="Zavěste nanečisto">
 <meta property="og:description" content="Bezpečný trenažér proti telefonním a online podvodům. Smyšlené scénáře, žádná data, rozbor taktik.">
 <style>
@@ -57,10 +58,11 @@ h2{font-size:1.3rem;margin:32px 0 12px}
 .avatar{width:44px;height:44px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:1.4rem;flex:none}
 .chathead .nm{font-weight:700}
 .chathead .sb{font-size:.85rem;color:var(--muted)}
-.hang{margin-left:auto;font:inherit;font-size:.85rem;font-weight:700;background:var(--risky);color:#fff;border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
+.chathead .nm{white-space:nowrap}
+.hang{margin-left:auto;white-space:nowrap;font:inherit;font-size:.85rem;font-weight:700;background:var(--risky);color:#fff;border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
 .hang:disabled{opacity:.4;cursor:default}
 .limits{margin-top:16px;font-size:.9rem;color:var(--muted);border:1px dashed var(--line);border-radius:10px;padding:10px 14px}
-.back{font:inherit;font-size:.85rem;background:none;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer}
+.back{white-space:nowrap;font:inherit;font-size:.85rem;background:none;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 12px;cursor:pointer}
 .chat{background:var(--surface-2);border:1px solid var(--line);border-top:0;border-radius:0 0 14px 14px;padding:16px;min-height:260px;display:flex;flex-direction:column;gap:10px}
 .setup{font-size:.9rem;color:var(--muted);text-align:center;font-style:italic;padding:0 8px}
 .msg{max-width:85%;padding:10px 14px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -356,7 +358,7 @@ function add(html, cls){const d=document.createElement('div'); d.className=cls; 
 function start(id){
   clearTimers();
   cur = SCEN.find(s=>s.id===id); path=[]; over=false; $('#hangBtn').disabled=false;
-  $('#hangBtn').textContent = cur.channel==='Telefonát' ? '📵 Zavěsit' : '✋ Ukončit konverzaci';
+  $('#hangBtn').textContent = cur.channel==='Telefonát' ? '📵 Zavěsit' : '✋ Ukončit';
   $('#home').style.display='none'; $('#play').style.display='block';
   $('#pAvatar').textContent=cur.icon; $('#pName').textContent=cur.name; $('#pSub').textContent=cur.sub;
   $('#chat').innerHTML=''; $('#debrief').innerHTML='';
